@@ -1,0 +1,26 @@
+{
+  "name": "c24-switcher-ext",
+  "version": "1.0.0",
+  "description": "Chrome extension to toggle between mobile and desktop view",
+  "main": "background.js",
+  "scripts": {
+    "build": "tsc && cp -r src/*.html . && cp -r dist/*.js . && cp -r *.png .",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladyslav-keidaliuk/c24-switcher-ext.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vladyslav-keidaliuk/c24-switcher-ext/issues"
+  },
+  "homepage": "https://github.com/vladyslav-keidaliuk/c24-switcher-ext#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.0.260",
+    "typescript": "^5.3.3"
+  }
+}
