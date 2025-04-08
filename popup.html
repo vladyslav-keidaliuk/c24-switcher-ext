@@ -1,27 +1,202 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Toggle View Mode</title>
+  <title>Check24 Helper</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: #2196F3; }
-    input:checked + .slider:before { transform: translateX(26px); }
+    body { 
+      font-family: Arial, sans-serif; 
+      width: 300px;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .tabs {
+      display: flex;
+      background-color: #f1f1f1;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #f1f1f1;
+      border: none;
+      outline: none;
+    }
+    
+    .tab.active {
+      background-color: #fff;
+      border-top: 2px solid #2196F3;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    .switch { 
+      position: relative; 
+      display: inline-block; 
+      width: 60px; 
+      height: 34px; 
+    }
+    .switch input { 
+      opacity: 0; 
+      width: 0; 
+      height: 0; 
+    }
+    .slider { 
+      position: absolute; 
+      cursor: pointer; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0; 
+      background-color: #ccc; 
+      transition: .4s; 
+      border-radius: 34px; 
+    }
+    .slider:before { 
+      position: absolute; 
+      content: ""; 
+      height: 26px; 
+      width: 26px; 
+      left: 4px; 
+      bottom: 4px; 
+      background-color: white; 
+      transition: .4s; 
+      border-radius: 50%; 
+    }
+    input:checked + .slider { 
+      background-color: #2196F3; 
+    }
+    input:checked + .slider:before { 
+      transform: translateX(26px); 
+    }
+
+    .button {
+      background-color: #2196F3;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .button:hover {
+      background-color: #1976D2;
+    }
+
+    .button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .button.danger {
+      background-color: #f44336;
+    }
+
+    .button.danger:hover {
+      background-color: #d32f2f;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #2196F3;
+    }
+
+    .save-credentials {
+      background-color: #4CAF50;
+    }
+
+    .save-credentials:hover {
+      background-color: #45a049;
+    }
+
+    .delete-credentials {
+      background-color: #f44336;
+    }
+
+    .delete-credentials:hover {
+      background-color: #d32f2f;
+    }
+
+    .credentials-status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .credentials-status.saved {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .credentials-status.deleted {
+      background-color: #ffebee;
+      color: #c62828;
+    }
   </style>
 </head>
 <body>
-  <h1>View Mode</h1>
-  <label class="switch">
-    <input type="checkbox" id="toggleSwitch">
-    <span class="slider"></span>
-  </label>
-  <p id="status">Desktop Mode</p>
-  
-  <!-- Button to open new tab -->
-  <button id="openNewTabBtn" style="margin-top: 20px;">Open in New Tab</button>
+  <div class="tabs">
+    <button class="tab active" data-tab="view">View Mode</button>
+    <button class="tab" data-tab="login">Login Helper</button>
+  </div>
+
+  <div id="view" class="tab-content active">
+    <h2>View Mode</h2>
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch">
+      <span class="slider"></span>
+    </label>
+    <p id="status">Desktop Mode</p>
+    <button id="openNewTabBtn" class="button">Open in New Tab</button>
+  </div>
+
+  <div id="login" class="tab-content">
+    <h2>Login Helper</h2>
+    <div class="input-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email">
+    </div>
+    <div class="input-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" placeholder="Enter your password">
+    </div>
+    <div class="credentials-buttons">
+      <button id="saveCredentials" class="button save-credentials">Save Credentials</button>
+      <button id="deleteCredentials" class="button delete-credentials">Delete Credentials</button>
+    </div>
+    <div id="credentialsStatus" class="credentials-status" style="display: none;"></div>
+    <button id="loginButton" class="button">Click Login</button>
+    <button id="clearCookiesButton" class="button danger" disabled>Clear Cookies</button>
+  </div>
 
   <script src="popup.js"></script>
 </body>

@@ -1,37 +1,43 @@
 {
     "manifest_version": 3,
-    "name": "View Mode Toggle",
+    "name": "Check24 Helper",
     "version": "1.0",
-    "description": "Toggle between mobile and desktop view by changing cookie values.",
+    "description": "Helper extension for Check24 website",
     "permissions": [
-        "cookies", 
-        "activeTab", 
-        "storage", 
-        "scripting", 
-        "tabs"
+        "activeTab",
+        "cookies",
+        "scripting",
+        "tabs",
+        "storage"
     ],
     "host_permissions": [
-        "https://www.check24.de/*"
+        "https://*.check24.de/*",
+        "https://*.check24-test.de/*",
+        "https://*.check24.de/",
+        "https://*.check24-test.de/"
     ],
     "background": {
         "service_worker": "background.js"
     },
     "icons": {
-        "128": "icon128.png",
+        "16": "icon16.png",
         "48": "icon48.png",
-        "16": "icon16.png"
+        "128": "icon128.png"
     },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "128": "icon128.png",
+            "16": "icon16.png",
             "48": "icon48.png",
-            "16": "icon16.png"
+            "128": "icon128.png"
         }
     },
     "content_scripts": [
         {
-            "matches": ["https://www.check24.de/*"],
+            "matches": [
+                "https://*.check24.de/*",
+                "https://*.check24-test.de/*"
+            ],
             "js": ["content.js"]
         }
     ]

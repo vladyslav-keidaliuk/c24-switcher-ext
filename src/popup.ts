@@ -1,9 +1,18 @@
 interface Message {
-  action: 'getMode' | 'toggleMode';
+  action: 'getMode' | 'toggleMode' | 'clickLogin' | 'clearCookies' | 'autoLogin';
+  credentials?: {
+    email: string;
+    password: string;
+  };
 }
 
 interface ModeResponse {
   mode: 'mobile' | 'desktop';
+}
+
+interface Credentials {
+  email: string;
+  password: string;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -15,6 +24,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toggleSwitch = document.getElementById('toggleSwitch') as HTMLInputElement;
     const statusText = document.getElementById('status') as HTMLSpanElement;
     const openNewTabBtn = document.getElementById('openNewTabBtn') as HTMLButtonElement;
+    const loginButton = document.getElementById('loginButton') as HTMLButtonElement;
+    const clearCookiesButton = document.getElementById('clearCookiesButton') as HTMLButtonElement;
+    const saveCredentialsButton = document.getElementById('saveCredentials') as HTMLButtonElement;
+    const deleteCredentialsButton = document.getElementById('deleteCredentials') as HTMLButtonElement;
+    const credentialsStatus = document.getElementById('credentialsStatus') as HTMLDivElement;
+    const emailInput = document.getElementById('email') as HTMLInputElement;
+    const passwordInput = document.getElementById('password') as HTMLInputElement;
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Check if we're on a Check24 website
+    const isCheck24Website = tab.url.includes('check24');
+    clearCookiesButton.disabled = !isCheck24Website;
+
+    // Function to show status message
+    function showStatus(message: string, type: 'saved' | 'deleted'): void {
+      credentialsStatus.textContent = message;
+      credentialsStatus.className = `credentials-status ${type}`;
+      credentialsStatus.style.display = 'block';
+      setTimeout(() => {
+        credentialsStatus.style.display = 'none';
+      }, 3000);
+    }
+
+    // Load saved credentials
+    chrome.storage.local.get(['credentials'], (result) => {
+      if (result.credentials) {
+        emailInput.value = result.credentials.email;
+        passwordInput.value = result.credentials.password;
+      }
+    });
+
+    // Tab switching functionality
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tabId!)?.classList.add('active');
+      });
+    });
 
     // Function to check the cookies and update the view
     async function checkAndSetView(): Promise<void> {
@@ -91,6 +142,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Open the new URL in a new tab
       chrome.tabs.create({ url: newUrl });
+    });
+
+    // Save credentials button click handler
+    saveCredentialsButton.addEventListener('click', () => {
+      const credentials: Credentials = {
+        email: emailInput.value,
+        password: passwordInput.value
+      };
+      
+      chrome.storage.local.set({ credentials }, () => {
+        showStatus('Credentials saved successfully!', 'saved');
+      });
+    });
+
+    // Delete credentials button click handler
+    deleteCredentialsButton.addEventListener('click', () => {
+      chrome.storage.local.remove(['credentials'], () => {
+        emailInput.value = '';
+        passwordInput.value = '';
+        showStatus('Credentials deleted successfully!', 'deleted');
+      });
+    });
+
+    // Add event listener for login button
+    loginButton.addEventListener('click', () => {
+      chrome.tabs.sendMessage(tabId, { action: 'clickLogin' } as Message, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to send message:', chrome.runtime.lastError);
+        }
+      });
+    });
+
+    // Add event listener for clear cookies button
+    clearCookiesButton.addEventListener('click', () => {
+      if (isCheck24Website) {
+        chrome.tabs.sendMessage(tabId, { action: 'clearCookies' } as Message, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Failed to send message:', chrome.runtime.lastError);
+          }
+        });
+      }
     });
 
   } catch (error) {
